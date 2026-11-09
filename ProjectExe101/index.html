@@ -1,0 +1,1207 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dạy Tớ Đi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1aa3ff; --deep:#0b4f9c; --ink:#14325c; --cyan:#4fe0ff;
+  --pink:#ff6fae; --yellow:#ffd23f; --orange:#ff9a2e; --purple:#9a6bff; --green:#35c96f; --red:#ff4d5e;
+  --glass:rgba(255,255,255,.88);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0a2550;overflow:hidden;font-family:'Baloo 2',system-ui,sans-serif;color:var(--ink);-webkit-user-select:none;user-select:none}
+button{font-family:inherit;cursor:pointer;border:0}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;overflow:hidden;transform-origin:center;background:#cfeeff}
+.screen{position:absolute;inset:0;display:none}
+.screen.active{display:block}
+.bg{position:absolute;inset:0}
+.bg svg{width:100%;height:100%;display:block}
+
+/* ---------- Glossy buttons ---------- */
+.gbtn{position:relative;color:#fff;font-weight:800;border-radius:999px;padding:10px 28px;font-size:26px;
+  background:linear-gradient(180deg,#5fd2ff,#1a8cff 55%,#0d6be0);
+  box-shadow:0 0 0 4px rgba(255,255,255,.85),0 0 24px 6px rgba(79,224,255,.75),inset 0 -6px 0 rgba(0,0,0,.15);
+  text-shadow:0 2px 0 rgba(0,0,0,.2);transition:transform .15s}
+.gbtn:hover{transform:translateY(-2px) scale(1.03)}
+.gbtn:active{transform:scale(.97)}
+.gbtn.orange{background:linear-gradient(180deg,#ffc35a,#ff8a1e 60%,#f06a00);box-shadow:0 0 0 4px rgba(255,255,255,.85),0 0 20px 4px rgba(255,170,60,.6),inset 0 -6px 0 rgba(0,0,0,.15)}
+.gbtn.purple{background:linear-gradient(180deg,#c49bff,#8b5cf6 60%,#6d3fe0);box-shadow:0 0 0 4px rgba(255,255,255,.85),0 0 20px 4px rgba(170,120,255,.6),inset 0 -6px 0 rgba(0,0,0,.15)}
+.gbtn.pink{background:linear-gradient(180deg,#ff9cc8,#ff5aa0 60%,#e43c86);box-shadow:0 0 0 4px rgba(255,255,255,.85),0 0 20px 4px rgba(255,110,170,.55),inset 0 -6px 0 rgba(0,0,0,.15)}
+.gbtn.green{background:linear-gradient(180deg,#7ee8a6,#2fc46a 60%,#1fa356);box-shadow:0 0 0 4px rgba(255,255,255,.85),0 0 20px 4px rgba(60,210,120,.55),inset 0 -6px 0 rgba(0,0,0,.15)}
+
+/* ---------- Home ---------- */
+#home .title{position:absolute;left:330px;top:40px;font-size:150px;font-weight:800;line-height:1;letter-spacing:-2px;transform:rotate(-3deg)}
+#home .title span{display:inline-block;-webkit-text-stroke:10px #2a2a8a;paint-order:stroke fill;filter:drop-shadow(0 8px 0 rgba(20,20,90,.35))}
+#home .title .t1{color:#ffb12e;background:linear-gradient(180deg,#ffe36b,#ff9b1f);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+#home .title .t2{color:#2fc4ff;background:linear-gradient(180deg,#8ef0ff,#1fa2ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-left:22px}
+#home .title .t3{background:linear-gradient(180deg,#ffb3e0,#c46bff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-left:22px}
+#home .subtitle{position:absolute;left:400px;top:215px;font-size:26px;font-weight:700;color:#0b4f9c;background:var(--glass);padding:4px 22px;border-radius:999px;box-shadow:0 4px 18px rgba(30,120,220,.25)}
+#home .bunny-wrap{position:absolute;left:40px;bottom:30px;width:360px;height:470px}
+#home .start{position:absolute;left:470px;top:440px;font-size:56px;padding:18px 70px}
+#home .start::after{content:'';position:absolute;left:10%;right:10%;bottom:-46px;height:30px;border-radius:50%;background:radial-gradient(rgba(79,224,255,.7),transparent 70%)}
+#home .side{position:absolute;right:50px;top:200px;display:flex;flex-direction:column;gap:26px;align-items:flex-end}
+#home .side .gbtn{font-size:30px;padding:8px 30px;border-radius:22px;transform:rotate(-4deg)}
+#home .side .gbtn:hover{transform:rotate(-4deg) scale(1.05)}
+#home .hook{position:absolute;left:470px;top:600px;width:520px;font-size:19px;font-weight:600;color:#0b3d78;text-align:center;line-height:1.3}
+
+/* ---------- Bunny ---------- */
+.bunny{position:relative;width:100%;height:100%}
+.bunny .body-all{position:absolute;inset:0;animation:bob 2.6s ease-in-out infinite;transform-origin:50% 100%}
+.bunny .spr,.bunny .over{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;-webkit-user-drag:none;pointer-events:none}
+.bunny .over{overflow:visible}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.bunny .l-coat,.bunny .l-bandage,.bunny .l-hurt{opacity:0;transition:opacity .4s}
+.bunny.hurt .l-hurt{opacity:1}
+.bunny.coat .l-coat{opacity:1;animation:dropin .7s cubic-bezier(.3,1.6,.5,1)}
+.bunny.bandaged .l-bandage{opacity:1;animation:dropin .9s cubic-bezier(.3,1.5,.5,1)}
+.bunny.bandaged .l-hurt{opacity:0}
+@keyframes dropin{0%{transform:translateY(-420px)}100%{transform:translateY(0)}}
+.bunny.jump .body-all{animation:jump .6s ease-out}
+@keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-46px) scale(1.04)}}
+
+/* ---------- Mimi's room ---------- */
+.room-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;-webkit-user-drag:none}
+.cal-day{position:absolute;left:834px;top:186px;width:64px;height:58px;border-radius:12px;background:#dff2ff;color:#1f6fd0;font-size:50px;font-weight:800;line-height:58px;text-align:center}
+.r-mimi{position:absolute;left:350px;top:285px;width:170px;height:325px;z-index:5;}
+.bubble.r-say{left:530px;top:290px;width:310px;transform-origin:bottom left;z-index:6}
+.bubble.r-say::after{content:'';position:absolute;left:-22px;bottom:30px;border:14px solid transparent;border-right:16px solid #fff}
+.bubble.r-say.mom::after{left:auto;right:-22px;border-right:14px solid transparent;border-left:16px solid #fff}
+.bubble .sub{display:block;margin-top:4px;font-size:19px;font-weight:700;color:#5b7aa3}
+.r-mom{position:absolute;left:1330px;top:215px;width:360px;height:425px;z-index:5;transform:scaleX(-1);transition:left 1.1s ease-out;pointer-events:none}
+.r-mom.in{left:815px}
+.r-mom img{width:100%;height:100%;object-fit:contain;-webkit-user-drag:none}
+.r-mom.talking img{animation:bob 1.2s ease-in-out infinite}
+.skip-btn{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);font-size:22px;padding:6px 24px;z-index:7}
+.skip-btn:hover{transform:translateX(-50%) scale(1.04)}
+.decor{position:absolute;line-height:1;z-index:3;transform:translate(-50%,-50%);filter:drop-shadow(0 4px 4px rgba(0,40,100,.25))}
+.decor.new{animation:decorin .8s cubic-bezier(.3,1.6,.5,1)}
+@keyframes decorin{from{transform:translate(-50%,-50%) scale(0) rotate(-30deg)}}
+.room-nav{display:none;position:absolute;left:50%;bottom:24px;transform:translateX(-50%);gap:18px;z-index:7}
+#room.view .room-nav{display:flex}
+#room.view .skip-btn{display:none}
+.gift-box{display:block;margin:10px auto 0;background:none;font-size:170px;line-height:1.1;animation:giftb 1s ease-in-out infinite}
+@keyframes giftb{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg) scale(1.06)}}
+.gift-box.opening{animation:giftopen .9s linear}
+@keyframes giftopen{0%,100%{transform:scale(1)}20%{transform:rotate(-14deg) scale(1.1)}40%{transform:rotate(14deg) scale(1.15)}60%{transform:rotate(-18deg) scale(1.2)}80%{transform:rotate(18deg) scale(1.3)}}
+.gift-item{display:none;font-size:150px;line-height:1.2;background:radial-gradient(circle,rgba(255,220,90,.75),transparent 62%);animation:starin .7s cubic-bezier(.3,1.6,.5,1)}
+.fade{position:absolute;inset:0;z-index:50;display:grid;place-items:center;background:linear-gradient(180deg,#bfe9ff,#fff);color:var(--deep);font-size:60px;font-weight:800;opacity:0;pointer-events:none;transition:opacity .5s}
+.fade.on{opacity:1;pointer-events:auto}
+
+/* ---------- HUD ---------- */
+.hud-day{position:absolute;left:18px;top:14px;display:flex;align-items:center;gap:10px;padding:6px 18px 6px 8px;border-radius:22px;
+  background:linear-gradient(180deg,#e9fbff,#bfe9ff);border:3px solid #fff;box-shadow:0 0 0 3px #2cb6ff,0 0 20px rgba(44,182,255,.6);z-index:5}
+.hud-day .sun{width:58px;height:58px;border-radius:16px;background:linear-gradient(180deg,#7fd7ff,#ffe9a8);display:grid;place-items:center;font-size:34px}
+.hud-day b{display:block;font-size:30px;line-height:1;color:var(--deep)}
+.hud-day small{display:block;font-size:16px;font-weight:700;color:#fff;background:var(--deep);border-radius:999px;padding:0 10px;margin-top:3px}
+.hud-right{position:absolute;right:18px;top:14px;display:flex;gap:12px;z-index:5}
+.icon-btn{width:64px;height:64px;border-radius:18px;background:linear-gradient(180deg,#fffbe9,#ffe7a6);border:3px solid #fff;box-shadow:0 0 0 3px #2cb6ff,0 6px 16px rgba(0,60,140,.3);font-size:32px;display:grid;place-items:center;position:relative}
+.icon-btn .badge{position:absolute;top:-10px;right:-10px;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-size:18px;font-weight:800;display:grid;place-items:center;border:3px solid #fff}
+.stars{height:64px;padding:0 18px;border-radius:18px;background:var(--glass);border:3px solid #fff;box-shadow:0 0 0 3px #ffc400;display:flex;align-items:center;gap:6px;font-size:30px;font-weight:800;color:#b07800}
+.progress{position:absolute;left:330px;top:26px;width:420px;height:26px;border-radius:999px;background:rgba(255,255,255,.75);border:3px solid #fff;box-shadow:0 0 0 3px #2cb6ff;overflow:hidden;z-index:5}
+.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4fe0ff,#35c96f);transition:width .6s}
+.progress span{position:absolute;inset:0;text-align:center;font-weight:800;font-size:16px;line-height:20px;color:var(--deep)}
+
+/* ---------- Bubbles ---------- */
+.bubble{position:absolute;background:#fff;border-radius:26px;padding:12px 20px;font-size:24px;font-weight:700;line-height:1.25;
+  border:4px solid #fff;box-shadow:0 0 0 4px #39c2ff,0 0 26px 6px rgba(57,194,255,.55);z-index:6;opacity:0;transform:scale(.6);transition:all .25s cubic-bezier(.3,1.5,.5,1)}
+.bubble.show{opacity:1;transform:scale(1)}
+.bubble .tag{position:absolute;top:-18px;right:20px;background:linear-gradient(180deg,#2d7bf0,#1a4fc0);color:#fff;font-size:15px;padding:0 12px;border-radius:999px;border:2px solid #fff}
+.bubble.mimi{left:24px;top:220px;width:300px;transform-origin:bottom left}
+.bubble.mimi::after{content:'';position:absolute;left:70px;bottom:-22px;border:14px solid transparent;border-top:16px solid #fff;filter:drop-shadow(0 4px 0 #39c2ff)}
+.bubble.kid{right:120px;top:96px;min-width:240px;max-width:520px;text-align:center;font-size:34px;text-decoration:underline;text-decoration-thickness:3px;text-underline-offset:6px;transform-origin:top right}
+.bubble.kid.interim{color:#7a8fb0;text-decoration:none}
+.bubble.kid .mic-ico{position:absolute;left:-26px;top:50%;margin-top:-22px;width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,#5fd2ff,#1a7cff);color:#fff;font-size:22px;display:grid;place-items:center;border:3px solid #fff;text-decoration:none}
+
+.bubble.kid .score{display:none;position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);background:var(--green);color:#fff;font-size:18px;font-weight:800;padding:0 14px;border-radius:999px;border:2px solid #fff;white-space:nowrap}
+.bubble.kid .score.low{background:var(--orange)}
+
+/* ---------- Mic ---------- */
+.mic{position:absolute;right:28px;bottom:28px;width:120px;height:120px;border-radius:50%;z-index:7;
+  background:radial-gradient(circle at 50% 35%,#7fe3ff,#1a7cff 60%,#173fb8);border:6px solid #fff;
+  box-shadow:0 0 0 6px #2cb6ff,0 0 40px 10px rgba(79,224,255,.8);display:grid;place-items:center}
+.mic svg{width:56px;height:56px}
+.mic.listening{animation:pulse 1s ease-in-out infinite}
+.mic.listening::before,.mic.listening::after{content:'';position:absolute;inset:-6px;border-radius:50%;border:5px solid rgba(79,224,255,.9);animation:ring 1.4s ease-out infinite}
+.mic.listening::after{animation-delay:.7s}
+@keyframes ring{to{transform:scale(1.7);opacity:0}}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.mic-label{position:absolute;right:20px;bottom:156px;width:136px;text-align:center;font-weight:800;font-size:18px;color:#fff;background:var(--deep);border-radius:999px;padding:2px 0;z-index:7}
+.mic-meter{position:absolute;right:20px;bottom:6px;width:136px;height:12px;border-radius:999px;background:rgba(255,255,255,.8);border:2px solid #fff;box-shadow:0 0 0 2px #2cb6ff;overflow:hidden;z-index:7;opacity:0;transition:opacity .2s}
+.mic-meter.show{opacity:1}
+.mic-meter i{display:block;height:100%;width:0;background:linear-gradient(90deg,#35c96f,#ffd23f,#ff4d5e);transition:width .08s}
+.kbd-btn{position:absolute;right:160px;bottom:40px;width:56px;height:56px;border-radius:16px;background:var(--glass);border:3px solid #fff;box-shadow:0 0 0 3px #2cb6ff;font-size:28px;z-index:7}
+.type-box{position:absolute;right:170px;bottom:136px;display:none;gap:8px;z-index:7}
+.type-box.show{display:flex}
+.type-box input{width:300px;height:60px;border-radius:18px;border:4px solid #2cb6ff;font:700 24px 'Baloo 2',sans-serif;padding:0 16px;color:var(--ink);outline:none}
+.type-box button{height:60px;padding:0 18px;border-radius:18px;background:var(--blue);color:#fff;font-size:22px;font-weight:800}
+
+/* ---------- Mission tray ---------- */
+.tray{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:12px;padding:10px 16px;border-radius:26px;background:rgba(255,255,255,.75);border:3px solid #fff;box-shadow:0 0 0 3px #2cb6ff,0 8px 24px rgba(0,60,140,.25);z-index:6}
+.tray .card{width:92px;height:96px;border-radius:18px;background:linear-gradient(180deg,#fff,#e6f4ff);border:3px solid #b9defa;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:transform .2s}
+.tray .card:hover{transform:translateY(-4px)}
+.tray .card .e{font-size:44px;line-height:1;filter:brightness(0) opacity(.25)}
+.tray .card .w{font-size:17px;font-weight:800;color:#8aa3c2}
+.tray .card.done{border-color:var(--green);background:linear-gradient(180deg,#f2fff7,#d3f7e2)}
+.tray .card.done .e{filter:none}
+.tray .card.done .w{color:var(--ink)}
+.tray .card.done::after{content:'✓';position:absolute;top:-10px;right:-10px;width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;display:grid;place-items:center;border:3px solid #fff}
+.tray .card.peek .e{filter:none;opacity:.9}
+.tray .card.hint{border-color:#ffc400;box-shadow:0 0 0 4px #ffe58a,0 0 22px 6px rgba(255,196,0,.7);animation:hintb 1s ease-in-out infinite}
+.tray .card.hint .e{filter:none}
+@keyframes hintb{50%{transform:translateY(-8px)}}
+.stall.hint{filter:drop-shadow(0 0 16px #ffd23f) drop-shadow(0 0 6px #ffb300)}
+
+/* ---------- Bunny in game ---------- */
+.g-bunny{position:absolute;left:80px;bottom:30px;width:176px;height:336px;z-index:4}
+
+/* ---------- Market scene ---------- */
+.stall{position:absolute;top:150px;width:210px;height:330px}
+.stall .awning{position:absolute;left:-8px;right:-8px;top:60px;height:58px;border-radius:14px 14px 30px 30px;background:repeating-linear-gradient(90deg,var(--c) 0 30px,#fff 30px 60px);box-shadow:0 6px 0 rgba(0,0,0,.08)}
+.stall .sign{position:absolute;left:30px;right:30px;top:0;height:74px;border-radius:18px;background:#fff8ec;border:5px solid var(--c);display:grid;place-items:center;font-size:52px}
+.stall .crate{position:absolute;left:4px;right:4px;top:128px;height:150px;border-radius:12px;background:linear-gradient(180deg,#c98a4e,#9b6230);padding:8px;display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:center;font-size:34px;line-height:1.05;overflow:hidden}
+.stall .base{position:absolute;left:-6px;right:-6px;top:272px;height:40px;border-radius:14px;background:linear-gradient(180deg,#fff,#d8ecfb);box-shadow:inset 0 -6px 0 #55d6ff}
+.stall .sign .q{display:none;font-size:56px;font-weight:800;color:#b05}
+.stall:not(.fixed) .sign .e{display:none}
+.stall:not(.fixed) .sign .q{display:block}
+.stall:not(.fixed) .crate,.stall:not(.fixed) .awning{filter:blur(2.5px) saturate(.25) contrast(1.4)}
+.stall:not(.fixed)::after{content:'';position:absolute;inset:0 -8px 30px;border-radius:14px;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,40,80,.22) 0 3px,transparent 3px 9px),repeating-linear-gradient(90deg,rgba(0,220,255,.15) 0 2px,transparent 2px 13px);
+  animation:glitch .35s steps(2) infinite;mix-blend-mode:multiply}
+@keyframes glitch{0%{transform:translate(0,0)}25%{transform:translate(-4px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-1px)}}
+.stall.fixed{animation:fixpop .7s cubic-bezier(.3,1.6,.5,1)}
+@keyframes fixpop{0%{transform:scale(.85)}100%{transform:scale(1)}}
+.stall .label{position:absolute;left:50%;top:84px;transform:translateX(-50%) scale(0);background:var(--green);color:#fff;font-weight:800;font-size:22px;padding:0 14px;border-radius:999px;border:3px solid #fff;z-index:2;transition:transform .4s cubic-bezier(.3,1.6,.5,1);white-space:nowrap}
+.stall.fixed .label{transform:translateX(-50%) scale(1)}
+
+/* ---------- Hospital scene ---------- */
+.hosp-building{position:absolute;right:20px;top:90px;width:560px;height:400px}
+.ambulance{position:absolute;right:30px;bottom:180px;font-size:190px;line-height:1;transform:translateX(900px);transition:transform 2.2s cubic-bezier(.2,.8,.3,1);z-index:3}
+.ambulance .siren{position:absolute;left:60px;top:22px;width:40px;height:20px;border-radius:10px;opacity:0}
+.got-ambulance .ambulance{transform:translateX(0)}
+.got-ambulance .ambulance .siren{animation:siren .5s steps(2) infinite}
+@keyframes siren{0%{opacity:1;background:#ff2d4a;box-shadow:0 0 30px 12px #ff2d4a}100%{opacity:1;background:#2d8bff;box-shadow:0 0 30px 12px #2d8bff}}
+.bed{position:absolute;left:360px;bottom:150px;width:330px;height:200px;z-index:3}
+.bed .frame{position:absolute;left:0;right:0;bottom:30px;height:60px;border-radius:16px;background:linear-gradient(180deg,#fff,#cfe6fb);border:4px solid #8cc8f5}
+.bed .sheet{position:absolute;left:90px;right:10px;bottom:70px;height:56px;border-radius:24px 24px 10px 10px;background:linear-gradient(180deg,#9ad8ff,#4fb3f5)}
+.bed .pillow{position:absolute;left:8px;bottom:80px;width:100px;height:46px;border-radius:24px;background:#fff;border:3px solid #d6e8f8}
+.bed .head{position:absolute;left:6px;bottom:80px;width:120px;height:120px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,#d8f0ff,#a9d8fb);border:4px solid #8cc8f5;z-index:-1}
+.bed .leg{position:absolute;bottom:0;width:14px;height:36px;background:#8cc8f5;border-radius:6px}
+.bed .bear{position:absolute;left:24px;bottom:96px;font-size:84px;line-height:1;transition:transform .4s}
+.bed .bear-bandage{position:absolute;left:30px;bottom:150px;width:86px;height:20px;border-radius:8px;background:repeating-linear-gradient(90deg,#fffaf0 0 10px,#f1e2c4 10px 12px);border:2px solid #e2c99a;transform:rotate(-12deg) translateY(-400px);opacity:0;transition:transform .9s cubic-bezier(.3,1.5,.5,1),opacity .2s}
+.got-bandage .bear-bandage{transform:rotate(-12deg) translateY(0);opacity:1}
+.bed .thermo{position:absolute;left:96px;bottom:118px;font-size:46px;transform:scale(0) rotate(40deg);transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.got-thermometer .thermo{transform:scale(1) rotate(40deg)}
+.bed .status{position:absolute;left:150px;bottom:150px;font-size:22px;font-weight:800;background:#fff;border-radius:14px;padding:2px 12px;border:3px solid #ff8fa3;color:#d02950;white-space:nowrap}
+.bed .status.ok{border-color:var(--green);color:#1a8c4b}
+.table{position:absolute;left:705px;bottom:150px;width:110px;height:120px;z-index:3}
+.table .top{position:absolute;left:0;right:0;top:40px;height:16px;border-radius:8px;background:#fff;border:3px solid #8cc8f5}
+.table .stem{position:absolute;left:46px;top:56px;width:14px;height:64px;background:#8cc8f5;border-radius:6px}
+.table .pill{position:absolute;left:24px;top:-6px;font-size:52px;transform:translateY(-500px);opacity:0;transition:transform 1s cubic-bezier(.3,1.4,.5,1),opacity .2s}
+.got-medicine .table .pill{transform:translateY(0);opacity:1}
+.nurse{position:absolute;left:260px;bottom:150px;font-size:150px;line-height:1;transform:scale(0);transform-origin:bottom center;transition:transform .6s cubic-bezier(.3,1.6,.5,1);z-index:3}
+.got-nurse .nurse{transform:scale(1)}
+.heart-float{position:absolute;font-size:34px;animation:heartup 1.8s ease-out forwards;pointer-events:none;z-index:9}
+@keyframes heartup{0%{transform:translateY(0) scale(.5);opacity:0}20%{opacity:1;transform:translateY(-20px) scale(1)}100%{transform:translateY(-140px) scale(1.2);opacity:0}}
+
+/* ---------- Effects ---------- */
+.spark{position:absolute;width:16px;height:16px;pointer-events:none;z-index:9;font-size:26px;line-height:16px}
+.toast{position:absolute;left:50%;top:110px;transform:translateX(-50%) translateY(-20px);background:var(--deep);color:#fff;font-weight:700;font-size:20px;padding:8px 22px;border-radius:999px;opacity:0;transition:all .3s;z-index:30;pointer-events:none;max-width:900px;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.plus-star{position:absolute;font-size:40px;font-weight:800;color:#ffb300;-webkit-text-stroke:2px #fff;z-index:20;pointer-events:none;animation:plus 1.2s ease-out forwards}
+@keyframes plus{0%{transform:scale(.4);opacity:0}25%{transform:scale(1.2);opacity:1}100%{transform:translateY(-90px);opacity:0}}
+.confetti{position:absolute;top:-30px;width:14px;height:22px;border-radius:3px;z-index:40;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(800px) rotate(720deg)}}
+
+/* ---------- Overlays ---------- */
+.overlay{position:absolute;inset:0;background:rgba(8,30,70,.55);display:none;align-items:center;justify-content:center;z-index:20;backdrop-filter:blur(3px)}
+.overlay.show{display:flex}
+.panel{position:relative;width:760px;border-radius:36px;background:linear-gradient(180deg,#ffffff,#e4f5ff);border:6px solid #fff;box-shadow:0 0 0 6px #2cb6ff,0 0 50px 10px rgba(79,224,255,.6);padding:30px 40px 34px;text-align:center}
+.panel h2{margin:0;font-size:46px;color:var(--deep);line-height:1.1}
+.panel p{font-size:26px;font-weight:600;margin:14px 0 22px;line-height:1.35}
+.panel .story-art{font-size:110px;line-height:1.1;height:130px}
+.panel .bunny-mini{position:absolute;left:-110px;bottom:-30px;width:190px;height:247px}
+.panel .dots{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
+.panel .dots i{width:14px;height:14px;border-radius:50%;background:#c4def5}
+.panel .dots i.on{background:var(--blue)}
+.topics{display:flex;gap:26px;justify-content:center;margin-top:18px}
+.topic{width:300px;border-radius:28px;padding:18px;background:#fff;border:4px solid #bfe3ff;box-shadow:0 8px 20px rgba(0,80,160,.15);transition:transform .2s;text-align:center}
+.topic:hover{transform:translateY(-6px) rotate(-1deg);border-color:var(--blue)}
+.topic .ti{font-size:90px;line-height:1.1}
+.topic h3{margin:4px 0 0;font-size:30px;color:var(--deep)}
+.topic .vi{font-size:20px;font-weight:600;color:#5b7aa3}
+.topic .cnt{margin-top:8px;display:inline-block;font-size:18px;font-weight:800;background:#e6f6ff;color:var(--deep);border-radius:999px;padding:2px 14px}
+.close-x{position:absolute;right:16px;top:12px;width:50px;height:50px;border-radius:50%;background:#e6f4ff;font-size:26px;color:var(--deep);font-weight:800}
+.big-stars{font-size:70px;letter-spacing:6px}
+.big-stars span{display:inline-block;animation:starin .6s cubic-bezier(.3,1.6,.5,1) both}
+.big-stars span:nth-child(2){animation-delay:.25s}.big-stars span:nth-child(3){animation-delay:.5s}
+@keyframes starin{from{transform:scale(0) rotate(-90deg)}}
+.learned-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:6px 0 22px}
+.learned-row span{background:#e9fbf0;border:3px solid var(--green);border-radius:16px;padding:2px 12px;font-size:22px;font-weight:800}
+.btn-row{display:flex;gap:22px;justify-content:center}
+
+/* ---------- Memory ---------- */
+#memory .mem-title{position:absolute;left:50%;top:14px;transform:translateX(-50%);text-align:center;z-index:2}
+#memory .mem-title h1{margin:0;font-size:72px;line-height:1;font-weight:800;letter-spacing:1px;-webkit-text-stroke:8px #1b2a8a;paint-order:stroke fill;color:#ffd84a;filter:drop-shadow(0 6px 0 rgba(10,20,80,.35))}
+#memory .mem-title h1 em{font-style:normal;color:#7fe6ff}
+#memory .mem-title div{display:inline-block;margin-top:2px;background:linear-gradient(180deg,#3a63e8,#1f3fb8);color:#fff;font-weight:700;font-size:20px;padding:0 18px;border-radius:999px;border:3px solid #fff}
+.back-btn{position:absolute;left:24px;top:22px;width:70px;height:70px;border-radius:50%;background:linear-gradient(180deg,#5fd2ff,#1a7cff);color:#fff;font-size:36px;font-weight:800;border:5px solid #fff;box-shadow:0 0 0 4px #2cb6ff,0 0 20px rgba(79,224,255,.7);z-index:3}
+.mem-cats{position:absolute;left:30px;top:150px;width:260px;display:flex;flex-direction:column;gap:16px;z-index:2}
+.mem-cat{height:78px;border-radius:22px;font-size:30px;font-weight:800;color:#fff;display:flex;align-items:center;gap:12px;padding:0 18px;border:4px solid #fff;text-shadow:0 2px 0 rgba(0,0,0,.2);position:relative;opacity:.85}
+.mem-cat .ci{font-size:40px}
+.mem-cat.on{opacity:1;transform:scale(1.05);box-shadow:0 0 0 4px #fff,0 0 26px 6px rgba(255,210,60,.8)}
+.mem-cat.locked{font-size:26px;white-space:nowrap;filter:grayscale(.7);opacity:.6;cursor:default}
+.mem-cat .new{position:absolute;right:-12px;top:-14px;background:#ff3d7f;color:#fff;font-size:15px;padding:0 10px;border-radius:999px;border:2px solid #fff;transform:rotate(10deg)}
+.mem-grid{position:absolute;left:315px;top:150px;width:560px;height:540px;border-radius:30px;background:rgba(40,110,230,.35);border:4px solid #8fd8ff;box-shadow:0 0 30px rgba(79,224,255,.6);padding:20px;z-index:2;overflow:auto}
+.mem-grid h3{margin:0 0 10px;color:#fff;font-size:30px;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.mem-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mem-card{height:140px;border-radius:20px;background:linear-gradient(180deg,#fff,#eaf5ff);border:4px solid #fff;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:transform .15s}
+.mem-card .e{font-size:64px;line-height:1.05}
+.mem-card .w{font-size:22px;font-weight:800}
+.mem-card.got::after{content:'✓';position:absolute;top:-8px;right:-8px;width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;font-weight:800;display:grid;place-items:center;border:3px solid #fff}
+.mem-card.lock .e{filter:brightness(0) opacity(.18)}
+.mem-card.lock .w{color:#9bb0c9}
+.mem-card.sel{box-shadow:0 0 0 4px #ffc400,0 0 20px rgba(255,196,0,.8);transform:scale(1.04)}
+.mem-detail{position:absolute;right:30px;top:150px;width:360px;height:540px;border-radius:30px;background:rgba(255,255,255,.2);border:4px solid #8fd8ff;box-shadow:0 0 30px rgba(79,224,255,.6);padding:16px;z-index:2;display:flex;flex-direction:column;gap:12px}
+.mem-detail .big{height:170px;display:grid;place-items:center;font-size:130px;line-height:1;background:radial-gradient(circle at 50% 70%,rgba(79,224,255,.6),transparent 65%);animation:bob 2.6s ease-in-out infinite}
+.mem-detail .wordpill{display:flex;align-items:center;gap:10px;justify-content:center}
+.mem-detail .wordpill b{font-size:40px;color:#fff;background:linear-gradient(180deg,#3a7cf0,#1f4fc8);border-radius:999px;padding:0 30px;border:4px solid #fff}
+.say-btn{width:54px;height:54px;border-radius:50%;background:linear-gradient(180deg,#5fd2ff,#1a7cff);color:#fff;font-size:24px;border:4px solid #fff;box-shadow:0 0 12px rgba(79,224,255,.8);flex:none}
+.mem-detail .vi{text-align:center;font-size:22px;font-weight:700;color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.sent-box{flex:1;border-radius:22px;background:rgba(255,255,255,.9);padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.sent-box h4{margin:0;font-size:24px;color:var(--deep)}
+.sent-box .lbl{font-size:16px;font-weight:800;color:#5b6fa8}
+.sent-row{display:flex;align-items:center;gap:8px}
+.sent-row div{flex:1;background:#fff;border:2px solid #cfe3f7;border-radius:14px;padding:4px 12px;font-size:19px;font-weight:700;min-height:38px}
+.sent-row .say-btn{width:42px;height:42px;font-size:18px;border-width:3px}
+.mem-bunny{position:absolute;left:30px;bottom:-30px;width:170px;height:221px;z-index:3}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- ================= HOME ================= -->
+  <section class="screen active" id="home">
+    <div class="bg" data-bg="home"></div>
+    <div class="bunny-wrap" data-bunny="wave"></div>
+    <div class="title"><span class="t1">Dạy</span><span class="t2">tớ</span><span class="t3">đi</span></div>
+    <div class="subtitle">Bé dạy thỏ Mimi nói tiếng Anh ✨</div>
+    <button class="gbtn start" data-act="room">Start Game ▶</button>
+    <div class="side">
+      <button class="gbtn" data-act="topics">📖 Learn</button>
+      <button class="gbtn orange" data-act="seeRoom">🛋️ My Room</button>
+      <button class="gbtn purple" data-act="memory">🧩 Memory</button>
+    </div>
+    <div class="hook">Chọn một chủ đề → nghe câu chuyện → <b>nói tiếng Anh</b> để thế giới của Mimi thay đổi!</div>
+  </section>
+
+  <!-- ================= MIMI'S ROOM ================= -->
+  <section class="screen" id="room">
+    <img class="room-bg" src="assets/room.webp" alt="Phòng của Mimi" draggable="false">
+    <div class="cal-day" id="calDay">1</div>
+    <div class="r-mimi" id="rMimi"></div>
+    <div class="r-mom" id="rMom"><img src="assets/mom.webp" alt="Mẹ của Mimi" draggable="false"></div>
+    <button class="gbtn skip-btn" id="skipBtn">Bỏ qua ⏭</button>
+    <div class="decor-layer" id="decorLayer"></div>
+    <div class="room-nav">
+      <button class="gbtn purple" data-act="memory">📒 My Memory</button>
+      <button class="gbtn orange" data-act="home">🏠 Trang chủ</button>
+    </div>
+    <div class="bubble r-say" id="rBubble"><span class="tag" id="rTag">Mimi</span><span id="rText"></span></div>
+  </section>
+
+  <!-- ================= GAME ================= -->
+  <section class="screen" id="game">
+    <div class="bg" data-bg="game"></div>
+    <div class="scene" id="scene"></div>
+    <div class="g-bunny" id="gBunny"></div>
+
+    <div class="hud-day"><div class="sun" id="hudIcon">🌤️</div><div><b id="hudDay">DAY 1</b><small id="hudTopic">MORNING</small></div></div>
+    <div class="progress"><i id="progBar"></i><span id="progTxt">0 / 0</span></div>
+    <div class="hud-right">
+      <div class="stars">⭐ <span id="starCount">0</span></div>
+      <button class="icon-btn" data-act="memory" title="My Memory">📒<span class="badge" id="memBadge">!</span></button>
+      <button class="icon-btn" data-act="sound" title="Thử loa">🔊</button>
+      <button class="icon-btn" data-act="home" title="Trang chủ">🏠</button>
+    </div>
+
+    <div class="bubble mimi" id="mimiBubble"><span class="tag">Mimi</span><span id="mimiText"></span></div>
+    <div class="bubble kid" id="kidBubble"><span class="tag">Bé</span><span class="mic-ico">🎤</span><span id="kidText"></span><span class="score" id="kidScore"></span></div>
+
+    <div class="tray" id="tray"></div>
+
+    <div class="mic-label" id="micLabel">Bấm để nói</div>
+    <div class="mic-meter" id="micMeter" title="Âm lượng micro"><i></i></div>
+    <button class="mic" id="micBtn" aria-label="Nói">
+      <svg viewBox="0 0 24 24" fill="#fff"><rect x="8.5" y="2" width="7" height="12" rx="3.5"/><path d="M5 11a7 7 0 0 0 14 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="11" y="18" width="2" height="3"/><rect x="8" y="20.5" width="8" height="2" rx="1"/></svg>
+    </button>
+    <button class="kbd-btn" id="kbdBtn" title="Gõ chữ thay vì nói">⌨️</button>
+    <form class="type-box" id="typeBox"><input id="typeInput" placeholder="Gõ từ tiếng Anh…" autocomplete="off"><button>Gửi</button></form>
+
+    <div class="overlay" id="introOv"><div class="panel">
+      <div class="bunny-mini" id="introBunny"></div>
+      <div class="story-art" id="introArt"></div>
+      <h2 id="introTitle"></h2>
+      <p id="introText"></p>
+      <div class="dots" id="introDots"></div>
+      <button class="gbtn" id="introNext">Tiếp ▶</button>
+    </div></div>
+
+    <div class="overlay" id="doneOv"><div class="panel">
+      <div class="big-stars"><span>⭐</span><span>⭐</span><span>⭐</span></div>
+      <h2>Tuyệt vời! Mimi học được rồi!</h2>
+      <p id="doneText"></p>
+      <div class="learned-row" id="doneWords"></div>
+      <div class="btn-row">
+        <button class="gbtn pink" data-act="gift">🎁 Nhận quà</button>
+      </div>
+    </div></div>
+  </section>
+
+  <!-- ================= MEMORY ================= -->
+  <section class="screen" id="memory">
+    <div class="bg" data-bg="memory"></div>
+    <button class="back-btn" data-act="back">←</button>
+    <div class="mem-title"><h1>MY <em>MEMORY</em></h1><div>What Mimi Knows</div></div>
+    <div class="mem-cats" id="memCats"></div>
+    <div class="mem-grid"><h3 id="memCatTitle"></h3><div class="mem-cards" id="memCards"></div></div>
+    <div class="mem-detail">
+      <div class="big" id="memBig">❔</div>
+      <div class="wordpill"><b id="memWord">—</b><button class="say-btn" id="memSay">🔊</button></div>
+      <div class="vi" id="memVi">Chơi game để dạy Mimi từ mới nhé!</div>
+      <div class="sent-box">
+        <h4>📝 My Sentences</h4>
+        <div class="lbl">⭐ Longest sentence</div>
+        <div class="sent-row"><div id="sentLong">—</div><button class="say-btn" data-say="sentLong">▶</button></div>
+        <div class="lbl">🕒 Most recent sentence</div>
+        <div class="sent-row"><div id="sentRecent">—</div><button class="say-btn" data-say="sentRecent">▶</button></div>
+      </div>
+    </div>
+    <div class="mem-bunny" data-bunny="wave"></div>
+  </section>
+
+  <!-- topic picker (global) -->
+  <div class="overlay" id="topicOv"><div class="panel" style="width:820px">
+    <button class="close-x" data-act="closeTopics">✕</button>
+    <h2>Hôm nay mình đi đâu nhỉ?</h2>
+    <div class="topics" id="topicList"></div>
+  </div></div>
+
+  <!-- gift box for finishing a word pack -->
+  <div class="overlay" id="giftOv"><div class="panel" style="width:640px">
+    <h2 id="giftTitle">Bạn có một hộp quà!</h2>
+    <button class="gift-box" id="giftBox" aria-label="Mở hộp quà">🎁</button>
+    <div class="gift-item" id="giftItem"></div>
+    <p id="giftText">Bấm vào hộp quà để mở nhé!</p>
+    <div class="btn-row" id="giftBtns" style="display:none">
+      <button class="gbtn orange" data-act="seeRoom">🛋️ Xem phòng của tớ</button>
+    </div>
+  </div></div>
+
+  <!-- microphone permission helper -->
+  <div class="overlay" id="micOv"><div class="panel" style="width:780px">
+    <button class="close-x" id="micClose">✕</button>
+    <div class="story-art">🎤</div>
+    <h2 id="micTitle">Cho Mimi nghe bạn nói nhé!</h2>
+    <p id="micText"></p>
+    <div class="btn-row">
+      <button class="gbtn green" id="micAllow">🎤 Cho phép micro</button>
+      <button class="gbtn orange" id="micType">⌨️ Gõ chữ thay thế</button>
+    </div>
+  </div></div>
+
+  <div class="fade" id="fade">🛒 Đến chợ thôi!</div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<!-- Bunny (Mimi) SVG template -->
+<template id="bunnyTpl">
+<div class="bunny"><div class="body-all">
+  <img class="spr" src="assets/mimi_happy.webp" alt="Mimi" draggable="false">
+  <svg class="over" viewBox="0 0 276 527">
+    <!-- hurt mark -->
+    <g class="l-hurt"><circle cx="118" cy="462" r="15" fill="#ff7b8f" opacity=".8"/><path d="M106 450l24 24M130 450l-24 24" stroke="#e2304f" stroke-width="4"/></g>
+    <!-- doctor coat -->
+    <g class="l-coat">
+      <path d="M100 338q-30 8-34 46l-6 62q0 10 12 10h136q12 0 12-10l-6-62q-4-38-34-46l-26-6h-28z" fill="#fff" stroke="#9fb8d4" stroke-width="3"/>
+      <path d="M118 332l24 46 24-46" fill="#cfeaff" stroke="#9fb8d4" stroke-width="2.5"/>
+      <line x1="142" y1="378" x2="142" y2="456" stroke="#9fb8d4" stroke-width="2.5"/>
+      <circle cx="132" cy="400" r="3.5" fill="#9fb8d4"/><circle cx="132" cy="426" r="3.5" fill="#9fb8d4"/>
+      <rect x="156" y="398" width="34" height="28" rx="4" fill="#eef6ff" stroke="#9fb8d4" stroke-width="2"/>
+      <path d="M173 403v18M164 412h18" stroke="#ff3d55" stroke-width="5"/>
+      <path d="M108 342q-10 40 12 58" stroke="#2b3a55" stroke-width="4" fill="none"/>
+      <circle cx="122" cy="404" r="8" fill="#9aa9bf" stroke="#2b3a55" stroke-width="3"/>
+    </g>
+    <!-- bandages -->
+    <g class="l-bandage">
+      <g transform="rotate(-25 200 150)"><rect x="170" y="140" width="60" height="20" rx="8" fill="#f6dfb8" stroke="#d8b682" stroke-width="2"/><rect x="190" y="140" width="20" height="20" fill="#fff3dc"/></g>
+      <rect x="92" y="448" width="54" height="30" rx="8" fill="#fffaf0" stroke="#dcc79c" stroke-width="2.5"/>
+      <path d="M95 458h48M95 468h48" stroke="#e9d7b2" stroke-width="2"/>
+    </g>
+  </svg>
+</div></div>
+</template>
+
+<script>
+/* =============== Data =============== */
+const TOPICS = {
+  fruits: {
+    id:'fruits', name:'Fruit Market', vi:'Chợ trái cây', icon:'🍎', cat:'Fruits', color:'linear-gradient(180deg,#ffc35a,#ff8a1e)',
+    words:[
+      {w:'apple',  vi:'quả táo', e:'🍎', alt:['apples'],  say:'Apple! Táo đỏ ngon quá! 🍎', c:'#ff5a5a'},
+      {w:'orange', vi:'quả cam', e:'🍊', alt:['oranges'], say:'Orange! Quả cam tròn tròn! 🍊', c:'#ff9a2e'},
+      {w:'banana', vi:'quả chuối', e:'🍌', alt:['bananas'], say:'Banana! Chuối vàng dài ghê! 🍌', c:'#f5c400'},
+      {w:'lemon',  vi:'quả chanh', e:'🍋', alt:['lemons'],  say:'Lemon! Chanh chua quá đi! 🍋', c:'#9bd33a'}
+    ]
+  },
+  hospital: {
+    id:'hospital', name:'Bunny goes to Hospital', vi:'Thỏ con đi bệnh viện', icon:'🏥', cat:'Hospital', color:'linear-gradient(180deg,#ff9cc8,#ff5aa0)',
+    intro:[
+      {art:'🐰💥🦵', title:'Ui da!', text:'Mimi chạy nhảy trong công viên thì bị <b>ngã đau chân</b>. Bạn Gấu cũng bị ốm nữa! 🤕', en:'Ouch! I fell down and hurt my leg. My friend Bear is sick too!', mood:'sad'},
+      {art:'🏥', title:'Đi bệnh viện thôi!', text:'Mình cần đưa Mimi và bạn Gấu tới <b>bệnh viện</b>. Nhưng Mimi không biết gọi ai giúp bằng tiếng Anh…', en:'We need to go to the hospital. But I do not know the words in English.', mood:'think'},
+      {art:'🎤🚑👩‍⚕️🩹', title:'Dạy tớ đi!', text:'Nói các từ tiếng Anh như <b>ambulance, doctor, nurse, bandage</b>… mọi thứ sẽ xuất hiện!', en:'Please teach me! Say the words, and see what happens!', mood:'happy'}
+    ],
+    words:[
+      {w:'ambulance',  vi:'xe cứu thương', e:'🚑', alt:['ambulances'], say:'Ambulance! Xe cứu thương tới rồi — wee-woo! 🚑'},
+      {w:'doctor',     vi:'bác sĩ', e:'🩺', alt:['doctors','dr'], say:'Doctor! Mimi mặc áo bác sĩ nè! 🩺'},
+      {w:'nurse',      vi:'y tá', e:'👩‍⚕️', alt:['nurses'], say:'Nurse! Cô y tá đến giúp rồi! 💉'},
+      {w:'bandage',    vi:'băng gạc', e:'🩹', alt:['bandages','band aid','band-aid','bandaid'], say:'Bandage! Băng bó chân cho Mimi nào! 🩹'},
+      {w:'medicine',   vi:'thuốc', e:'💊', alt:['medicines','medication'], say:'Medicine! Uống thuốc mau khỏe nhé Gấu! 💊'},
+      {w:'thermometer',vi:'nhiệt kế', e:'🌡️', alt:['thermometers'], say:'Thermometer! Đo nhiệt độ cho bạn Gấu! 🌡️'}
+    ]
+  }
+};
+const LOCKED_CATS = [{name:'Colors', icon:'🎨', color:'linear-gradient(180deg,#c49bff,#8b5cf6)'},{name:'Numbers', icon:'🔢', color:'linear-gradient(180deg,#5fd2ff,#1a7cff)'}];
+
+/* =============== Persistence =============== */
+const KEY = 'daytodi-v1';
+let save = {learned:{}, stars:0, day:1, longest:'', recent:'', decor:[]};
+try{ const raw = localStorage.getItem(KEY); if(raw) save = Object.assign(save, JSON.parse(raw)); }catch(e){}
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(save)); }catch(e){} }
+const learnedOf = id => (save.learned[id] ||= []);
+
+/* =============== Stage scaling =============== */
+const stage = document.getElementById('stage');
+function fit(){ const s = Math.min(innerWidth/1280, innerHeight/720); stage.style.transform = `translate(-50%,-50%) scale(${s})`; }
+addEventListener('resize', fit); fit();
+const $ = id => document.getElementById(id);
+
+/* =============== Background city (generated SVG) =============== */
+function citySVG(variant){
+  let r = 7; const rnd = () => (r = (r*9301+49297)%233280)/233280;
+  let towers = '';
+  for(let i=0;i<14;i++){
+    const w = 50+rnd()*60, x = i*95 - 20 + rnd()*30, h = 150+rnd()*230, y = 470-h;
+    towers += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="url(#tw)" opacity="${.75+rnd()*.25}"/>`;
+    for(let k=y+24;k<460;k+=28) towers += `<rect x="${x+6}" y="${k}" width="${w-12}" height="4" rx="2" fill="#62dcff" opacity=".55"/>`;
+  }
+  const floorTint = variant==='memory' ? '#3d63c9' : '#e6f3ff';
+  const sky = variant==='memory'
+    ? '<stop offset="0" stop-color="#1b2f86"/><stop offset=".6" stop-color="#3a62d6"/><stop offset="1" stop-color="#6aa8f2"/>'
+    : '<stop offset="0" stop-color="#6cc8ff"/><stop offset=".55" stop-color="#d3f0ff"/><stop offset="1" stop-color="#f4fbff"/>';
+  const extras = variant==='memory'
+    ? Array.from({length:40},()=>`<circle cx="${rnd()*1280}" cy="${rnd()*420}" r="${1+rnd()*2.5}" fill="#fff" opacity="${.4+rnd()*.6}"/>`).join('')+
+      '<circle cx="1120" cy="110" r="46" fill="#7fb4ff" opacity=".8"/><ellipse cx="1120" cy="110" rx="80" ry="14" fill="none" stroke="#ffe58a" stroke-width="5" opacity=".8"/>'
+    : '<g fill="#fff" opacity=".9"><ellipse cx="170" cy="100" rx="95" ry="26"/><ellipse cx="230" cy="84" rx="60" ry="30"/><ellipse cx="980" cy="70" rx="110" ry="28"/><ellipse cx="1050" cy="55" rx="62" ry="28"/><ellipse cx="620" cy="140" rx="70" ry="18"/></g>';
+  return `<svg viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky-${variant}" x1="0" y1="0" x2="0" y2="1">${sky}</linearGradient>
+    <linearGradient id="tw" x1="0" x2="1"><stop offset="0" stop-color="#f2faff"/><stop offset="1" stop-color="#b6daf5"/></linearGradient>
+    <linearGradient id="fl-${variant}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${floorTint}"/><stop offset="1" stop-color="${variant==='memory'?'#1e3a96':'#b9d8f2'}"/></linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7fe8ff" stop-opacity=".8"/><stop offset="1" stop-color="#7fe8ff" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#sky-${variant})"/>
+  ${extras}
+  <g opacity="${variant==='memory'?.35:1}">${towers}
+    <rect x="636" y="80" width="16" height="400" fill="#dff1ff"/>
+    <ellipse cx="644" cy="140" rx="78" ry="18" fill="#eaf7ff" stroke="#62dcff" stroke-width="4"/>
+    <ellipse cx="644" cy="196" rx="44" ry="11" fill="#eaf7ff" stroke="#62dcff" stroke-width="3"/>
+    <g transform="translate(860 190)"><ellipse cx="0" cy="0" rx="120" ry="20" fill="#8ad46a"/><path d="M-110 4q110 90 220 0z" fill="#c9a77d"/><rect x="-20" y="-80" width="40" height="80" rx="10" fill="#f2faff"/><circle cx="0" cy="-86" r="26" fill="#d6f2ff" stroke="#62dcff" stroke-width="3"/></g>
+  </g>
+  <rect y="460" width="1280" height="260" fill="url(#fl-${variant})"/>
+  <ellipse cx="640" cy="470" rx="760" ry="34" fill="none" stroke="#7fe6ff" stroke-width="8" opacity=".55"/>
+  <ellipse cx="640" cy="600" rx="420" ry="60" fill="url(#glow)" opacity=".5"/>
+  <ellipse cx="300" cy="560" rx="120" ry="16" fill="none" stroke="#9eeaff" stroke-width="3" opacity=".5"/>
+  <ellipse cx="980" cy="610" rx="150" ry="18" fill="none" stroke="#9eeaff" stroke-width="3" opacity=".5"/>
+  <g fill="#3fae5a"><ellipse cx="20" cy="690" rx="70" ry="26" transform="rotate(-40 20 690)"/><ellipse cx="70" cy="710" rx="60" ry="20" transform="rotate(-15 70 710)" fill="#5cc96f"/>
+  <ellipse cx="1260" cy="690" rx="70" ry="26" transform="rotate(40 1260 690)"/><ellipse cx="1210" cy="712" rx="60" ry="20" transform="rotate(15 1210 712)" fill="#5cc96f"/></g>
+</svg>`;
+}
+document.querySelectorAll('[data-bg]').forEach(el => el.innerHTML = citySVG(el.dataset.bg));
+
+/* =============== Bunny factory =============== */
+const SPRITES = {happy:'mimi_happy', sad:'mimi_puzzled', think:'mimi_think', surprised:'mimi_surprised'};
+Object.values(SPRITES).forEach(n => { new Image().src = `assets/${n}.webp`; });
+function makeBunny(host){
+  const b = $('bunnyTpl').content.cloneNode(true).querySelector('.bunny');
+  host.innerHTML = ''; host.appendChild(b);
+  return b;
+}
+document.querySelectorAll('[data-bunny]').forEach(el => makeBunny(el));
+const gBunny = makeBunny($('gBunny'));
+const introBunny = makeBunny($('introBunny'));
+const roomBunny = makeBunny($('rMimi'));
+function mood(b, m){
+  b.classList.remove('sad','think','surprised');
+  if(m && m!=='happy') b.classList.add(m);
+  b.querySelector('.spr').src = `assets/${SPRITES[m] || SPRITES.happy}.webp`;
+}
+
+/* =============== Speech synthesis =============== */
+const TTS = window.speechSynthesis;
+let voices = [], ttsErr = '', ttsLast = null, pendingSpeech = null, viWarned = false;
+function loadVoices(){ if(TTS) voices = TTS.getVoices(); }
+if(TTS){ loadVoices(); TTS.onvoiceschanged = loadVoices; }
+function pickVoice(lang){
+  const pre = lang.slice(0,2).toLowerCase();
+  const list = voices.filter(v => (v.lang||'').toLowerCase().replace('_','-').startsWith(pre));
+  const fav = pre==='en' ? [/aria|jenny|ana/i, /google us english/i, /zira/i, /en-us/i] : [/hoaimy|namminh|online/i, /google/i, /an\b/i];
+  for(const re of fav){ const v = list.find(v => re.test(v.name) || re.test(v.lang)); if(v) return v; }
+  return list[0] || null;
+}
+let speakToken = 0, speakFallbackT;
+// onend runs once Mimi has finished talking (not when she is interrupted by a newer line)
+function speak(text, lang='en-US', rate=.85, onend, pitch=1.3){
+  const token = ++speakToken; clearTimeout(speakFallbackT);
+  let done = false;
+  const finish = () => { if(done || token !== speakToken) return; done = true; clearTimeout(speakFallbackT); if(onend) onend(); };
+  if(!TTS){ setTimeout(finish, 300); return; }
+  // While the mic is open, Windows/headsets may mute playback (and the mic would hear Mimi) → wait until listening ends
+  if(listening){ pendingSpeech = [text, lang, rate, onend, pitch]; return; }
+  if(!voices.length) loadVoices();
+  const v = pickVoice(lang);
+  if(!v && lang.startsWith('vi')){
+    if(!viWarned){ viWarned = true; toast('Trình duyệt chưa có giọng đọc tiếng Việt — Mimi sẽ chỉ đọc tiếng Anh 🔈', 4000); }
+    setTimeout(finish, 300); return;
+  }
+  if(TTS.speaking || TTS.pending) TTS.cancel();
+  TTS.resume();   // Chrome can get stuck in "paused" state
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang; u.rate = rate; u.pitch = pitch; u.volume = 1;
+  if(v) u.voice = v;
+  u.onend = finish;
+  u.onerror = e => { if(e.error==='interrupted' || e.error==='canceled') return; ttsErr = e.error; finish(); };
+  ttsLast = u;    // keep a reference so Chrome doesn't garbage-collect it mid-sentence
+  setTimeout(() => { if(token === speakToken) TTS.speak(u); }, 60);   // speaking right after cancel() is silently dropped in Chrome
+  speakFallbackT = setTimeout(finish, 1500 + text.length * 95 / rate);   // Chrome sometimes never fires onend
+}
+function flushSpeech(){
+  const ding = dingPending; dingPending = false;
+  if(ding) playDing();
+  if(pendingSpeech){ const p = pendingSpeech; pendingSpeech = null; setTimeout(() => speak(...p), ding ? 700 : 350); }
+}
+/* Correct-answer chime: a rising four-note arpeggio, generated so it needs no audio file */
+let sfxCtx = null, dingPending = false;
+function playDing(){
+  if(listening){ dingPending = true; return; }   // the open mic can mute playback, so wait until it closes
+  const AC = window.AudioContext || window.webkitAudioContext; if(!AC) return;
+  sfxCtx = sfxCtx || new AC();
+  sfxCtx.resume();
+  const t0 = sfxCtx.currentTime + .02;
+  [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+    const o = sfxCtx.createOscillator(), g = sfxCtx.createGain(), t = t0 + i*.09;
+    o.type = 'triangle'; o.frequency.value = f;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.32, t + .015);
+    g.gain.exponentialRampToValueAtTime(.001, t + .38);
+    o.connect(g).connect(sfxCtx.destination);
+    o.start(t); o.stop(t + .4);
+  });
+}
+function soundTest(){
+  if(!TTS){ toast('Trình duyệt không hỗ trợ đọc giọng nói 😢'); return; }
+  loadVoices(); ttsErr = '';
+  speak('Hello! I am Mimi. Teach me English!', 'en-US', .9);
+  setTimeout(() => {
+    const en = pickVoice('en-US'), vi = pickVoice('vi-VN');
+    toast(`🔊 Giọng đọc: ${voices.length} giọng · EN: ${en ? en.name : 'không có'} · VI: ${vi ? vi.name : 'không có'}` +
+          (ttsErr ? ` · lỗi: <b>${ttsErr}</b>` : '') + '<br><small>Không nghe thấy? Kiểm tra âm lượng / tai nghe Bluetooth (xem hướng dẫn).</small>', 7000);
+  }, 1200);
+}
+
+/* =============== UI helpers =============== */
+let toastT;
+function toast(msg, ms=2600){ const t=$('toast'); t.innerHTML=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),ms); }
+let mimiT;
+function mimiSay(html, m, ms=4200){
+  $('mimiText').innerHTML = html; $('mimiBubble').classList.add('show');
+  if(m) mood(gBunny, m);
+  clearTimeout(mimiT); if(ms) mimiT = setTimeout(()=>$('mimiBubble').classList.remove('show'), ms);
+}
+let kidT;
+function kidSay(text, interim, score=null){
+  $('kidText').textContent = text; const b=$('kidBubble'); b.classList.add('show'); b.classList.toggle('interim', !!interim);
+  const sc = $('kidScore'); sc.style.display = score===null ? 'none' : 'block';
+  if(score!==null){ sc.textContent = `🎯 ${Math.round(score*100)}%`; sc.classList.toggle('low', score < PASS_SCORE); }
+  clearTimeout(kidT); if(!interim) kidT = setTimeout(()=>b.classList.remove('show'), 3500);
+}
+function stagePoint(el){
+  const s = stage.getBoundingClientRect(), r = el.getBoundingClientRect(), k = s.width/1280;
+  return {x:(r.left - s.left + r.width/2)/k, y:(r.top - s.top + r.height/2)/k};
+}
+function burst(el, chars='✨⭐💫'){
+  const p = stagePoint(el), arr = [...chars];
+  for(let i=0;i<14;i++){
+    const d = document.createElement('div'); d.className='spark'; d.textContent = arr[i%arr.length];
+    d.style.left=p.x+'px'; d.style.top=p.y+'px'; stage.appendChild(d);
+    const a = Math.PI*2*i/14, dist = 90+Math.random()*70;
+    d.animate([{transform:'translate(0,0) scale(.3)',opacity:1},{transform:`translate(${Math.cos(a)*dist}px,${Math.sin(a)*dist}px) scale(1.2)`,opacity:0}],{duration:900+Math.random()*300,easing:'cubic-bezier(.2,.8,.3,1)'}).onfinish=()=>d.remove();
+  }
+  const ps = document.createElement('div'); ps.className='plus-star'; ps.textContent='+1 ⭐'; ps.style.left=(p.x-40)+'px'; ps.style.top=(p.y-60)+'px'; stage.appendChild(ps); setTimeout(()=>ps.remove(),1300);
+}
+function confetti(){
+  const cols=['#ff5a8a','#ffd23f','#4fe0ff','#35c96f','#9a6bff','#ff9a2e'];
+  for(let i=0;i<70;i++){ const c=document.createElement('div'); c.className='confetti'; c.style.left=Math.random()*1280+'px'; c.style.background=cols[i%cols.length]; c.style.animationDuration=(2+Math.random()*2)+'s'; c.style.animationDelay=(Math.random()*.6)+'s'; stage.appendChild(c); setTimeout(()=>c.remove(),5000); }
+}
+function hearts(el){ const p=stagePoint(el); for(let i=0;i<5;i++){ const h=document.createElement('div'); h.className='heart-float'; h.textContent=['💖','💙','💛'][i%3]; h.style.left=(p.x-40+i*20)+'px'; h.style.top=(p.y-30)+'px'; h.style.animationDelay=(i*.15)+'s'; stage.appendChild(h); setTimeout(()=>h.remove(),2400);} }
+
+/* =============== Screens & navigation =============== */
+let prevScreen = 'home';
+function show(id){
+  const cur = document.querySelector('.screen.active');
+  if(cur && cur.id !== id && cur.id !== 'memory') prevScreen = cur.id;
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id===id));
+  if(id !== 'game') stopListening();
+  if(id !== 'room'){ endScene(); $('room').classList.remove('view'); $('rBubble').classList.remove('show'); }
+  if(id === 'memory') renderMemory();
+  if(id === 'room') enterRoom();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if(!b) return;
+  const a = b.dataset.act;
+  if(a==='topics'){ $('doneOv').classList.remove('show'); openTopics(); }
+  else if(a==='closeTopics') $('topicOv').classList.remove('show');
+  else if(a==='memory'){ $('doneOv').classList.remove('show'); show('memory'); }
+  else if(a==='room') show('room');
+  else if(a==='home'){ $('doneOv').classList.remove('show'); show('home'); }
+  else if(a==='sound') soundTest();
+  else if(a==='gift'){ $('doneOv').classList.remove('show'); openGift(); }
+  else if(a==='seeRoom'){ $('giftOv').classList.remove('show'); viewRoom(); }
+  else if(a==='back'){
+    if(prevScreen==='room') viewRoom();
+    else show(prevScreen==='game' && game && game.got.size < game.t.words.length ? 'game' : 'home');
+  }
+});
+function openTopics(){
+  $('topicList').innerHTML = Object.values(TOPICS).map(t => `
+    <button class="topic" data-topic="${t.id}">
+      <div class="ti">${t.icon}</div><h3>${t.name}</h3><div class="vi">${t.vi}</div>
+      <div class="cnt">${learnedOf(t.id).length} / ${t.words.length} từ ⭐</div>
+    </button>`).join('');
+  $('topicOv').classList.add('show');
+}
+$('topicList').addEventListener('click', e => {
+  const t = e.target.closest('[data-topic]'); if(!t) return;
+  $('topicOv').classList.remove('show');
+  if(t.dataset.topic==='fruits') show('room');   // Mom sends Mimi to the market
+  else startTopic(t.dataset.topic);
+});
+
+/* =============== Game =============== */
+let game = null, idleT;
+function startTopic(id){
+  const t = TOPICS[id];
+  game = {t, got:new Set()};
+  buildScene(t);
+  $('hudDay').textContent = 'DAY ' + save.day;
+  $('hudTopic').textContent = t.name.toUpperCase();
+  $('hudIcon').textContent = t.icon;
+  $('starCount').textContent = save.stars;
+  $('mimiBubble').classList.remove('show'); $('kidBubble').classList.remove('show');
+  buildTray(); updateProgress();
+  show('game');
+  if(t.intro) runIntro(t); else beginPlay(t);
+}
+async function beginPlay(t){
+  autoTries = 0;
+  await ensureMic();   // ask for microphone permission right as the game starts
+  if(t.id==='fruits') askNext('Oh no! The fruit stalls are broken. ', 'Ôi không, quầy hàng hỏng hết rồi! 😱<br>');
+  else askNext('Ouch! My leg hurts. Please help me! ', 'Ui da, đau chân quá! 😢<br>');
+}
+function buildScene(t){
+  const sc = $('scene'); sc.className = 'scene';
+  gBunny.setAttribute('class','bunny');
+  if(t.id==='fruits'){
+    sc.innerHTML = t.words.map((w,i)=>`
+      <div class="stall" data-word="${w.w}" style="left:${330+i*230}px;--c:${w.c}">
+        <div class="sign"><span class="e">${w.e}</span><span class="q">?</span></div>
+        <div class="awning"></div>
+        <div class="crate">${w.e.repeat(15)}</div>
+        <div class="base"></div>
+        <div class="label">${w.w}</div>
+      </div>`).join('');
+    mood(gBunny,'think');
+  } else {
+    sc.innerHTML = `
+      <svg class="hosp-building" viewBox="0 0 560 400">
+        <rect x="40" y="70" width="480" height="330" rx="22" fill="#ffffff" stroke="#9fd4f7" stroke-width="6"/>
+        <rect x="190" y="10" width="180" height="80" rx="18" fill="#fff" stroke="#ff6b81" stroke-width="6"/>
+        <path d="M265 26h30v20h20v30h-20v-0h-30v0h-20v-30h20z" fill="#ff4d5e" transform="translate(0 -4)"/>
+        <text x="280" y="140" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="44" fill="#1a6fd6">HOSPITAL</text>
+        ${[0,1,2,3,4].map(i=>`<rect x="${70+i*90}" y="165" width="64" height="54" rx="10" fill="#bfe9ff" stroke="#7fcff7" stroke-width="3"/>`).join('')}
+        ${[0,1,3,4].map(i=>`<rect x="${70+i*90}" y="245" width="64" height="54" rx="10" fill="#bfe9ff" stroke="#7fcff7" stroke-width="3"/>`).join('')}
+        <rect x="236" y="240" width="88" height="160" rx="12" fill="#8fdcff" stroke="#4fb3f5" stroke-width="4"/>
+        <line x1="280" y1="244" x2="280" y2="400" stroke="#4fb3f5" stroke-width="3"/>
+      </svg>
+      <div class="ambulance" data-word="ambulance"><span class="siren"></span>🚑</div>
+      <div class="nurse" data-word="nurse">👩‍⚕️</div>
+      <div class="bed" id="bed">
+        <div class="head"></div><div class="leg" style="left:16px"></div><div class="leg" style="right:16px"></div>
+        <div class="frame"></div><div class="pillow"></div><div class="sheet"></div>
+        <div class="bear" data-word="bandage">🐻</div>
+        <div class="bear-bandage"></div>
+        <div class="thermo" data-word="thermometer">🌡️</div>
+        <div class="status" id="bedStatus">🤒 Gấu bị ốm</div>
+      </div>
+      <div class="table" data-word="medicine"><div class="pill">💊</div><div class="top"></div><div class="stem"></div></div>`;
+    gBunny.classList.add('hurt');
+    mood(gBunny,'sad');
+  }
+}
+function buildTray(){
+  const t = game.t;
+  $('tray').innerHTML = t.words.map(w => `<button class="card ${game.got.has(w.w)?'done':''}" data-w="${w.w}" title="Bấm để nghe gợi ý"><span class="e">${w.e}</span><span class="w">${game.got.has(w.w)?w.w:'?'}</span></button>`).join('');
+}
+$('tray').addEventListener('click', e => {
+  const c = e.target.closest('.card'); if(!c || !game) return;
+  const w = game.t.words.find(x => x.w===c.dataset.w);
+  if(game.got.has(w.w)){ speak(w.w); return; }
+  // hint: show the picture + Vietnamese, then the English sound
+  c.classList.add('peek'); setTimeout(()=>c.classList.remove('peek'),2500);
+  autoTries = 0;
+  mimiAsk(`Gợi ý: “${w.vi}” là <b>${w.w}</b>!<br><small style="color:#5b7aa3">Bé nói theo vào micro nhé 🎤</small>`, `This is ${w.w}. Can you say ${w.w}?`, 'happy');
+});
+
+/* ---------- Conversation: Mimi asks out loud, then the mic opens for the child's answer ---------- */
+let autoTries = 0;
+function autoListen(){
+  if(!game || !$('game').classList.contains('active') || document.querySelector('.overlay.show') || listening) return;
+  if(!micOK || autoTries >= 2) { if(micOK) $('micLabel').textContent = 'Bấm 🎤 để trả lời'; return; }
+  autoTries++; startListening();
+}
+function mimiAsk(html, en, m='think'){ mimiSay(html, m, 0); armIdle(); speak(en, 'en-US', .9, autoListen); }
+function askNext(enIntro='', viIntro=''){
+  if(!game) return;
+  const w = game.t.words.find(x => !game.got.has(x.w)); if(!w) return;
+  document.querySelectorAll('#tray .card, #scene [data-word]').forEach(c => c.classList.toggle('hint', (c.dataset.w||c.dataset.word)===w.w));
+  mimiAsk(`${viIntro}<b>What’s this?</b> 🤔<br><small style="color:#5b7aa3">“${w.vi}” tiếng Anh là gì? Nói vào micro nhé! 🎤</small>`,
+          `${enIntro}What's this? Can you teach me?`, game.got.size ? 'think' : (game.t.id==='hospital' ? 'sad' : 'think'));
+}
+function updateProgress(){
+  const n = game.got.size, tot = game.t.words.length;
+  $('progBar').style.width = (n/tot*100)+'%';
+  $('progTxt').textContent = `${n} / ${tot} từ`;
+  $('memBadge').style.display = n ? 'grid' : 'none';
+  $('memBadge').textContent = n;
+}
+function runIntro(t){
+  let i = 0;
+  const draw = () => {
+    const s = t.intro[i];
+    $('introArt').textContent = s.art; $('introTitle').textContent = s.title; $('introText').innerHTML = s.text;
+    mood(introBunny, s.mood);
+    $('introDots').innerHTML = t.intro.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('');
+    $('introNext').textContent = i < t.intro.length-1 ? 'Tiếp ▶' : 'Bắt đầu! 🎤';
+    // narrate in Vietnamese when a Vietnamese voice exists, otherwise in simple English
+    if(pickVoice('vi-VN')) speak(s.text.replace(/<[^>]+>/g,''), 'vi-VN', 1);
+    else speak(s.en, 'en-US', .9);
+  };
+  $('introNext').onclick = () => {
+    if(++i < t.intro.length) return draw();
+    $('introOv').classList.remove('show'); if(TTS) TTS.cancel();
+    beginPlay(t);
+  };
+  draw(); $('introOv').classList.add('show');
+}
+function armIdle(){
+  clearTimeout(idleT);
+  idleT = setTimeout(() => {
+    if(!game || !$('game').classList.contains('active') || document.querySelector('.overlay.show')) return;
+    if(listening || (TTS && TTS.speaking)) return armIdle();
+    autoTries = 0;
+    askNext('Hello? ', 'Bạn ơi? ');
+  }, 16000);
+}
+
+/* Matching what the child said */
+const PASS_SCORE = .9;   // the recognizer must be at least 90% sure it heard the word
+const norm = s => ' ' + s.toLowerCase().replace(/[^a-z\s-]/g,' ').replace(/-/g,' ').replace(/\s+/g,' ').trim() + ' ';
+function findWords(texts){
+  const hits = new Set();
+  for(const raw of texts){
+    const s = norm(raw);
+    for(const w of game.t.words) for(const f of [w.w, ...(w.alt||[])])
+      if(s.includes(' '+norm(f).trim()+' ')) hits.add(w.w);
+  }
+  return [...hits];
+}
+// alts: [{t, c}] from the recognizer, c = its confidence 0..1. Empty alts = typed answer, which counts as exact.
+function handleUtterance(text, alts=[]){
+  if(!game) return;
+  text = text.trim(); if(!text) return;
+  armIdle();
+  const noScore = alts.length && alts.every(a => !a.c);   // some browsers report no confidence at all
+  // alternatives without a confidence are guesses the recognizer did not stand behind, so they never count
+  const heard = !alts.length || noScore ? [{t:text, c:1}, ...alts.map(a => ({t:a.t, c:1}))] : alts.filter(a => a.c);
+  const score = {};
+  for(const a of heard) for(const w of findWords([a.t])) score[w] = Math.max(score[w] || 0, a.c);
+  const all = Object.keys(score);
+  const best = all.length ? Math.max(...all.map(w => score[w])) : 0;
+  kidSay(text, false, all.length && alts.length && !noScore ? best : null);
+  const hits = all.filter(w => score[w] >= PASS_SCORE);
+  const almost = all.find(w => score[w] < PASS_SCORE && !game.got.has(w));
+  if(!hits.length && almost){
+    const w = game.t.words.find(x => x.w===almost), pct = Math.round(score[almost]*100);
+    mimiAsk(`Gần đúng rồi! Mới được <b>${pct}%</b>, cần từ ${PASS_SCORE*100}%.<br><small style="color:#5b7aa3">Nghe lại nhé: <b>${w.w}</b> 🔊</small>`,
+            `Almost! Listen. ${w.w}. Now you say it. ${w.w}.`);
+    return;
+  }
+  if(hits.length){
+    // remember sentences Mimi heard
+    save.recent = text.charAt(0).toUpperCase() + text.slice(1);
+    if(text.split(/\s+/).length > (save.longest||'').split(/\s+/).filter(Boolean).length) save.longest = save.recent;
+    persist();
+  }
+  const fresh = hits.filter(w => !game.got.has(w));
+  if(fresh.length){ fresh.forEach((w,i) => setTimeout(()=>learn(w), i*1200)); return; }
+  if(hits.length){
+    const w = game.t.words.find(x=>x.w===hits[0]); autoTries = 0;
+    mimiSay(`Tớ nhớ rồi! <b>${w.w}</b> là ${w.vi}! 😊`, 'happy', 0);
+    speak(`${w.w}! I know that one!`, 'en-US', .9, () => askNext('And now, ', 'Còn cái này nhé! '));
+    return;
+  }
+  mimiAsk('Hmm? Tớ chưa hiểu lắm… Bạn nói lại được không? 🤔', "Hmm? I don't understand. Can you say it again?");
+}
+function learn(word){
+  const t = game.t, w = t.words.find(x => x.w===word);
+  game.got.add(word);
+  const sc = $('scene'); sc.classList.add('got-'+word);
+  const el = sc.querySelector(`[data-word="${word}"]`);
+  if(el) el.classList.add('fixed');
+  // character reactions
+  gBunny.classList.remove('jump'); void gBunny.offsetWidth; gBunny.classList.add('jump');
+  if(word==='doctor') gBunny.classList.add('coat');
+  if(word==='bandage'){ gBunny.classList.add('bandaged'); gBunny.classList.remove('hurt'); }
+  mimiSay(w.say, 'happy', 0);
+  autoTries = 0;
+  document.querySelectorAll('.hint').forEach(c => c.classList.remove('hint'));
+  const more = game.got.size < t.words.length;
+  playDing();
+  const thanks = () => speak(`${w.w}! Yay! Thank you!`, 'en-US', .9, () => { if(more && game && game.t===t) setTimeout(() => askNext('', 'Tiếp nè! '), 500); });
+  if(listening) thanks(); else setTimeout(thanks, 550);   // let the chime ring first
+  setTimeout(()=>burst(el || $('gBunny')), word==='ambulance'?1600:350);
+  if(t.id==='hospital') updateBear();
+  save.stars++; $('starCount').textContent = save.stars;
+  const L = learnedOf(t.id); if(!L.includes(word)) L.push(word);
+  persist();
+  buildTray(); updateProgress();
+  if(game.got.size === t.words.length) setTimeout(finishTopic, 2600);
+}
+function updateBear(){
+  const g = game.got, st = $('bedStatus');
+  if(g.has('bandage') && g.has('medicine')){ st.textContent = '😊 Gấu khỏe rồi!'; st.classList.add('ok'); hearts(st); }
+  else if(g.has('nurse') || g.has('doctor')) st.textContent = '🤒 Đang chữa…';
+}
+function finishTopic(){
+  stopListening(); pendingSpeech = null; clearTimeout(idleT);
+  save.day++; persist();
+  $('doneText').innerHTML = `Nhờ bạn, Mimi đã học <b>${game.t.words.length}</b> từ chủ đề <b>${game.t.name}</b>!`;
+  $('doneWords').innerHTML = game.t.words.map(w=>`<span>${w.e} ${w.w}</span>`).join('');
+  $('doneOv').classList.add('show'); confetti();
+  speak('Great job! Thank you for teaching me!');
+}
+
+/* =============== Speech recognition =============== */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const isEdge = /Edg\//.test(navigator.userAgent);
+let rec = null, listening = false, session = null, edgeWarned = false;
+function setListening(on){ listening = on; $('micBtn').classList.toggle('listening', on); $('micLabel').textContent = on ? 'Mimi đang nghe…' : 'Bấm để nói'; if(on) mood(gBunny,'surprised'); }
+function stopListening(){ if(rec && listening){ try{ rec.abort(); }catch(e){} } setListening(false); stopMeter(); flushSpeech(); }
+
+/* Live microphone level bar: shows whether the mic is actually picking up sound */
+let meter = null;
+async function startMeter(){
+  stopMeter();
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const an = ctx.createAnalyser(); an.fftSize = 512;
+    ctx.createMediaStreamSource(stream).connect(an);
+    const buf = new Uint8Array(an.fftSize), bar = $('micMeter').firstElementChild;
+    meter = {stream, ctx, raf:0, peak:0};
+    const m = meter;
+    const tick = () => {
+      an.getByteTimeDomainData(buf);
+      let v = 0; for(const x of buf) v = Math.max(v, Math.abs(x-128));
+      const lvl = Math.min(1, v/50); m.peak = Math.max(m.peak, lvl);
+      bar.style.width = (lvl*100)+'%';
+      m.raf = requestAnimationFrame(tick);
+    };
+    tick(); $('micMeter').classList.add('show');
+  }catch(e){}
+}
+function stopMeter(){
+  if(!meter) return;
+  cancelAnimationFrame(meter.raf); meter.stream.getTracks().forEach(t => t.stop()); meter.ctx.close();
+  if(session) session.peak = meter.peak;
+  meter = null; $('micMeter').classList.remove('show');
+}
+
+function startListening(){
+  if(!SR){ micHelp('nosr'); return; }
+  if(isEdge && !edgeWarned){ edgeWarned = true; toast('Bạn đang dùng <b>Edge</b> — nếu Mimi không nghe được, hãy mở bằng <b>Chrome</b> (run.bat) nhé!', 5000); }
+  if(!rec){
+    rec = new SR(); rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 4;
+    rec.onaudiostart = () => { $('micLabel').textContent = 'Nói đi nào… 🎙️'; };
+    rec.onspeechstart = () => { if(session) session.speech = true; $('micLabel').textContent = 'Nghe thấy rồi! 👂'; };
+    rec.onresult = e => {
+      if(session) session.result = true;
+      const res = e.results[e.results.length-1];
+      const text = res[0].transcript;
+      if(res.isFinal){ const alts = [...res].map(a => ({t:a.transcript, c:a.confidence})); handleUtterance(text, alts); }
+      else kidSay(text, true);
+    };
+    rec.onerror = e => {
+      if(session) session.error = e.error;
+      if(e.error==='not-allowed' || e.error==='service-not-allowed'){ micOK = false; micErr = 'speech:'+e.error; micHelp(micPerm==='denied' ? 'denied' : 'os'); }
+      else if(e.error==='audio-capture'){ micErr = 'speech:audio-capture'; micHelp('nomic'); }
+      else if(e.error==='network') toast('Không kết nối được dịch vụ nhận giọng nói 🌐 — cần Internet; nếu đang bật <b>Cloudflare WARP / VPN</b> thì thử tắt.', 6000);
+      else if(e.error!=='no-speech' && e.error!=='aborted') toast('Lỗi nhận giọng nói: ' + e.error, 4000);
+    };
+    rec.onend = () => {
+      setListening(false); stopMeter(); flushSpeech();
+      const s = session; session = null;
+      if(s && !s.result && s.error!=='aborted' && !['not-allowed','service-not-allowed','audio-capture','network'].includes(s.error)){
+        if(s.peak < 0.08) mimiAsk('Tớ không nghe thấy tiếng nào cả… 🙉<br><small>Micro không thu được âm thanh — kiểm tra đúng micro trong Windows (Sound → Input) và nói gần hơn nhé.</small>', "I can't hear you. Please say it again!");
+        else mimiAsk('Tớ nghe thấy tiếng nhưng chưa hiểu chữ nào… 🤔<br><small>' + (isEdge ? 'Edge nhận giọng nói kém — hãy mở bằng <b>Chrome</b>.' : 'Nói chậm và rõ từng từ tiếng Anh nhé!') + '</small>', 'Sorry, can you say it slowly?');
+        return;
+      }
+      if(game && !game.got.size) mood(gBunny, game.t.id==='hospital'?'sad':'think'); else mood(gBunny,'happy');
+    };
+  }
+  if(TTS) TTS.cancel();   // don't let Mimi's voice be picked up as the child's
+  session = {result:false, speech:false, error:'', peak:1};
+  try{ rec.start(); setListening(true); startMeter(); }catch(e){ session = null; }
+}
+
+/* Microphone permission: getUserMedia triggers the browser's "Allow microphone" prompt */
+let micOK = false;
+let micErr = '', micPerm = '?';
+function micHelp(kind){
+  const isFile = location.protocol === 'file:';
+  const embedded = window.top !== window || !window.chrome;
+  const msgs = {
+    ask: 'Trình duyệt sẽ hỏi quyền dùng <b>micro</b>. Hãy bấm <b>“Cho phép / Allow”</b> để Mimi nghe được bạn nói tiếng Anh nhé!',
+    // the browser itself remembers "Block" for this site
+    denied: 'Trình duyệt đang <b>chặn micro</b> cho trang này. Bấm biểu tượng <b>🔒 / ⓘ</b> bên trái thanh địa chỉ → <b>Microphone</b> → <b>Cho phép</b>, rồi nhấn <b>F5</b>.' +
+            '<br><small>Hoặc mở <b>chrome://settings/content/microphone</b>, xoá trang này khỏi danh sách “Không được phép”.</small>' +
+            '<br><small>Đang xem trong <b>khung xem trước của ứng dụng</b> (không có thanh địa chỉ)? Khung đó luôn chặn micro → chạy <b>run.bat</b> để mở bằng Chrome/Edge.</small>',
+    // browser did not block, but the microphone still could not be opened → Windows / another app / embedded viewer
+    os: 'Trình duyệt <b>không mở được micro</b>. Hãy kiểm tra:<br>' +
+        '<small style="display:block;text-align:left;margin:6px auto 0;max-width:600px;line-height:1.45">' +
+        '① Đang xem trong <b>khung xem trước của ứng dụng</b> (không có thanh địa chỉ)? → khung này không có micro, hãy chạy <b>run.bat</b> để mở bằng <b>Chrome/Edge</b>.<br>' +
+        '② Windows: <b>Settings → Privacy &amp; security → Microphone</b> → bật <b>Microphone access</b> và <b>Let desktop apps access your microphone</b>.<br>' +
+        '③ Tắt Zoom / Meet / Discord… đang dùng micro, rồi bấm <b>Thử lại</b>.</small>',
+    nomic: 'Không tìm thấy <b>micro</b> nào. Hãy cắm tai nghe/micro (hoặc chọn đúng micro trong Windows Sound settings) rồi thử lại.',
+    nosr: 'Trình duyệt này chưa hỗ trợ nhận giọng nói. Hãy mở bằng <b>Google Chrome</b> hoặc <b>Microsoft Edge</b> (chạy <b>run.bat</b>), hoặc gõ chữ thay thế.'
+  };
+  const diag = kind==='ask' ? '' :
+    `<br><small style="color:#7a8fb0">Chẩn đoán: quyền=${micPerm} · lỗi=${micErr||'—'} · ${isFile?'mở bằng file:// (nên dùng run.bat)':location.host}${embedded?' · trình duyệt nhúng':''}</small>`;
+  $('micTitle').textContent = kind==='ask' ? 'Cho Mimi nghe bạn nói nhé!' : 'Chưa dùng được micro 😢';
+  $('micText').innerHTML = msgs[kind] + diag;
+  $('micAllow').style.display = kind==='nosr' ? 'none' : '';
+  $('micAllow').textContent = kind==='ask' ? '🎤 Cho phép micro' : '🔄 Thử lại';
+  $('micOv').classList.add('show');
+}
+async function requestMic(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){ micOK = true; return true; } // let SpeechRecognition prompt itself
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true});
+    stream.getTracks().forEach(t => t.stop());
+    micOK = true; $('micOv').classList.remove('show');
+    toast('Đã bật micro 🎤 — nghe Mimi hỏi rồi trả lời nhé!');
+    if(game && $('game').classList.contains('active') && !listening){ autoTries = 0; askNext(); }
+    return true;
+  }catch(e){
+    micErr = e.name;
+    try{ micPerm = (await navigator.permissions.query({name:'microphone'})).state; }catch(_){}
+    if(e.name==='NotFoundError' || e.name==='DevicesNotFoundError') micHelp('nomic');
+    else if(e.name==='NotAllowedError' && micPerm==='denied') micHelp('denied');
+    else micHelp('os');   // NotReadableError, or blocked outside the browser's own setting
+    return false;
+  }
+}
+async function ensureMic(){
+  if(!SR){ micHelp('nosr'); return false; }
+  if(micOK) return true;
+  let state = 'prompt';
+  try{ state = (await navigator.permissions.query({name:'microphone'})).state; }catch(e){}
+  micPerm = state;
+  if(state === 'granted'){ micOK = true; return true; }
+  micHelp(state === 'denied' ? 'denied' : 'ask');
+  return false;
+}
+$('micAllow').onclick = requestMic;
+$('micType').onclick = () => { $('micOv').classList.remove('show'); $('typeBox').classList.add('show'); $('typeInput').focus(); };
+$('micClose').onclick = () => $('micOv').classList.remove('show');
+$('micBtn').onclick = async () => {
+  if(listening) return stopListening();
+  if(!micOK && !(await ensureMic())) return;
+  autoTries = 0;
+  startListening();
+};
+$('kbdBtn').onclick = () => { $('typeBox').classList.toggle('show'); $('typeInput').focus(); };
+$('typeBox').onsubmit = e => { e.preventDefault(); const v=$('typeInput').value; $('typeInput').value=''; handleUtterance(v); };
+addEventListener('keydown', e => { if(e.code==='Space' && $('game').classList.contains('active') && document.activeElement !== $('typeInput') && !document.querySelector('.overlay.show')){ e.preventDefault(); $('micBtn').click(); } });
+
+/* =============== Mimi's room: Mom asks Mimi to buy the four fruits, then we move to the market =============== */
+/* Lines are spoken in English; the bubble shows the English with a Vietnamese subtitle. */
+const MOM_SCRIPT = [
+  {who:'mimi', en:'Hi! I am Mimi. Let\'s play!', vi:'Chào bạn! Mình là Mimi. Chơi với tớ nhé!'},
+  {who:'mom',  en:'Mimi, can you help me?', vi:'Mimi ơi, con giúp mẹ được không?'},
+  {who:'mimi', en:'Yes, Mom! What is it?', vi:'Dạ mẹ! Có chuyện gì ạ?'},
+  {who:'mom',  en:'Please go to the market and buy some fruit.', vi:'Con đi chợ mua giúp mẹ ít trái cây nhé.'},
+  {who:'mom',  en:'We need an apple, an orange, a banana and a lemon.', vi:'Mẹ cần táo 🍎, cam 🍊, chuối 🍌 và chanh 🍋.'},
+  {who:'mimi', en:'But I do not know these words in English!', vi:'Nhưng con chưa biết các từ này bằng tiếng Anh!', m:'sad'},
+  {who:'mom',  en:'Your friend can teach you. Have a nice trip!', vi:'Bạn của con sẽ dạy con. Đi cẩn thận nhé!'},
+  {who:'mimi', en:'Please teach me! Let\'s go to the market!', vi:'Dạy tớ đi! Mình đi chợ thôi!'}
+];
+let scene = null, roomView = false;
+function viewRoom(){ roomView = true; show('room'); }   // just look at the room, no cutscene
+function enterRoom(){
+  $('calDay').textContent = save.day;
+  renderDecor();
+  if(TTS) TTS.cancel();
+  mood(roomBunny, 'happy');
+  $('room').classList.toggle('view', roomView);
+  if(roomView){
+    roomView = false;
+    $('rTag').textContent = 'Mimi'; $('rBubble').classList.remove('mom');
+    const [en, vi] = newDecor ? ['Wow! Thank you! I love it!', 'Oa! Cảm ơn bạn! Tớ thích lắm!'] : ['This is my room!', 'Đây là phòng của tớ!'];
+    newDecor = null;
+    $('rText').innerHTML = `<b>${en}</b><small class="sub">${vi}</small>`;
+    $('rBubble').classList.add('show');
+    speak(en, 'en-US', .9, null, 1.45);
+    return;
+  }
+  const s = scene = {i:0, wait:null};
+  s.wait = setTimeout(() => sceneLine(s), 500);
+}
+function sceneLine(s){
+  if(s !== scene) return;
+  const l = MOM_SCRIPT[s.i];
+  if(!l) return goMarket();
+  const mom = l.who==='mom';
+  if(mom && !$('rMom').classList.contains('in')){   // Mom walks in after Mimi's greeting
+    $('rBubble').classList.remove('show');
+    mood(roomBunny, 'surprised');
+    $('rMom').classList.add('in');
+    s.wait = setTimeout(() => sceneLine(s), 1200);
+    return;
+  }
+  $('rTag').textContent = mom ? 'Mẹ' : 'Mimi';
+  $('rBubble').classList.toggle('mom', mom);
+  $('rText').innerHTML = `<b>${l.en}</b><small class="sub">${l.vi}</small>`;
+  $('rBubble').classList.add('show');
+  mood(roomBunny, l.m || 'happy');
+  if(!mom){ roomBunny.classList.remove('jump'); void roomBunny.offsetWidth; roomBunny.classList.add('jump'); }
+  $('rMom').classList.toggle('talking', mom);
+  speak(l.en, 'en-US', .9, () => { s.i++; s.wait = setTimeout(() => sceneLine(s), 450); }, mom ? 1.05 : 1.45);
+}
+function goMarket(){
+  endScene();
+  if(TTS) TTS.cancel();
+  $('fade').classList.add('on');
+  setTimeout(() => { startTopic('fruits'); $('fade').classList.remove('on'); }, 1100);
+}
+function endScene(){
+  if(!scene) return;
+  clearTimeout(scene.wait); scene = null;
+  $('rMom').classList.remove('in','talking');
+  $('rBubble').classList.remove('show','mom');
+}
+$('skipBtn').onclick = goMarket;
+
+/* =============== Gift box: every finished word pack gives one room decoration =============== */
+const DECOR = [
+  {id:'teddy',   e:'🧸', vi:'Gấu bông',   en:'teddy bear', x:210,  y:430, s:72},
+  {id:'flower',  e:'🌻', vi:'Hoa hướng dương', en:'sunflower', x:1133, y:318, s:84},
+  {id:'rocket',  e:'🚀', vi:'Tên lửa đồ chơi', en:'toy rocket', x:1133, y:480, s:84},
+  {id:'ball',    e:'⚽', vi:'Quả bóng',   en:'ball',       x:830,  y:600, s:64},
+  {id:'balloon', e:'🎈', vi:'Bóng bay',   en:'balloon',    x:985,  y:330, s:90},
+  {id:'kite',    e:'🪁', vi:'Cánh diều',  en:'kite',       x:640,  y:190, s:70}
+];
+const GIFT_STARS = 5;   // when every decoration is already owned
+let newDecor = null;
+function renderDecor(){
+  $('decorLayer').innerHTML = DECOR.filter(d => save.decor.includes(d.id)).map(d =>
+    `<div class="decor ${d.id===newDecor?'new':''}" style="left:${d.x}px;top:${d.y}px;font-size:${d.s}px" title="${d.en}">${d.e}</div>`).join('');
+}
+function openGift(){
+  $('giftTitle').textContent = 'Bạn có một hộp quà!';
+  $('giftText').textContent = 'Bấm vào hộp quà để mở nhé!';
+  $('giftBox').style.display = 'block'; $('giftBox').classList.remove('opening');
+  $('giftItem').style.display = 'none'; $('giftBtns').style.display = 'none';
+  $('giftOv').classList.add('show');
+  speak('A gift for you! Open it!', 'en-US', .9, null, 1.45);
+}
+$('giftBox').onclick = () => {
+  if($('giftBox').classList.contains('opening')) return;
+  $('giftBox').classList.add('opening');
+  setTimeout(() => {
+    const left = DECOR.filter(d => !save.decor.includes(d.id));
+    const d = left[Math.floor(Math.random()*left.length)];
+    $('giftBox').style.display = 'none';
+    if(d){
+      save.decor.push(d.id); newDecor = d.id;
+      $('giftItem').textContent = d.e;
+      $('giftTitle').textContent = 'Mở quà thành công!';
+      $('giftText').innerHTML = `Bạn nhận được <b>${d.vi}</b> (${d.en}) để trang trí phòng!`;
+      speak(`A ${d.en}! Wow!`, 'en-US', .9, null, 1.45);
+    } else {
+      save.stars += GIFT_STARS;
+      $('giftItem').textContent = '⭐';
+      $('giftTitle').textContent = 'Mở quà thành công!';
+      $('giftText').innerHTML = `Phòng đã đủ đồ trang trí rồi, bạn nhận <b>${GIFT_STARS} ⭐</b> nhé!`;
+      speak(`${GIFT_STARS} stars! Wow!`, 'en-US', .9, null, 1.45);
+    }
+    persist();
+    $('giftItem').style.display = 'block'; $('giftBtns').style.display = 'flex';
+    confetti();
+  }, 900);
+};
+
+/* =============== Memory screen =============== */
+let memCat = 'fruits', memSel = null;
+function renderMemory(){
+  $('memCats').innerHTML = Object.values(TOPICS).map(t => {
+    const got = learnedOf(t.id).length;
+    return `<button class="mem-cat ${memCat===t.id?'on':''}" data-cat="${t.id}" style="background:${t.color}"><span class="ci">${t.icon}</span>${t.cat}${got?'<span class="new">'+got+' ⭐</span>':''}</button>`;
+  }).join('') + LOCKED_CATS.map(c => `<div class="mem-cat locked" style="background:${c.color}"><span class="ci">${c.icon}</span>${c.name} 🔒</div>`).join('');
+  const t = TOPICS[memCat], L = learnedOf(t.id);
+  $('memCatTitle').textContent = `${t.icon} ${t.cat} — ${L.length}/${t.words.length}`;
+  $('memCards').innerHTML = t.words.map(w => {
+    const got = L.includes(w.w);
+    return `<button class="mem-card ${got?'got':'lock'} ${memSel===w.w?'sel':''}" data-mw="${w.w}"><span class="e">${w.e}</span><span class="w">${got?w.w:'???'}</span></button>`;
+  }).join('');
+  const sel = t.words.find(w => w.w===memSel && L.includes(w.w)) || t.words.find(w => L.includes(w.w));
+  if(sel){ memSel = sel.w; $('memBig').textContent = sel.e; $('memWord').textContent = sel.w[0].toUpperCase()+sel.w.slice(1); $('memVi').textContent = 'Nghĩa: ' + sel.vi;
+    $('memCards').querySelector(`[data-mw="${sel.w}"]`).classList.add('sel'); }
+  else { $('memBig').textContent = '❔'; $('memWord').textContent = '???'; $('memVi').textContent = 'Chơi chủ đề này để dạy Mimi từ mới nhé!'; }
+  $('sentLong').textContent = save.longest || '—';
+  $('sentRecent').textContent = save.recent || '—';
+}
+$('memCats').addEventListener('click', e => { const c = e.target.closest('[data-cat]'); if(c){ memCat = c.dataset.cat; memSel = null; renderMemory(); } });
+$('memCards').addEventListener('click', e => {
+  const c = e.target.closest('[data-mw]'); if(!c) return;
+  if(c.classList.contains('lock')){ toast('Mimi chưa học từ này — vào game dạy Mimi nhé! 🎮'); return; }
+  memSel = c.dataset.mw; renderMemory(); speak(memSel);
+});
+$('memSay').onclick = () => memSel && speak(memSel);
+document.querySelectorAll('[data-say]').forEach(b => b.onclick = () => { const t = $(b.dataset.say).textContent; if(t && t!=='—') speak(t); });
+</script>
+</body>
+</html>
